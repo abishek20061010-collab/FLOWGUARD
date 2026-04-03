@@ -262,3 +262,81 @@ export async function updateFcmToken(
     next(err);
   }
 }
+
+// ─── POST /api/auth/complete-profile ──────────────────────────────────────────
+
+/**
+ * Creates the user's profile if it doesn't exist (used for Google OAuth flow).
+ * Requires the JWT via 'Authorization: Bearer <token>'.
+ */
+export async function completeProfile(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      res.status(401).json({
+        success: false,
+        error: 'Authorization token is missing. Provide a Bearer token.',
+      });
+      return;
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    const { data: authData, error: authError } =
+      await supabaseAdmin.auth.getUser(token);
+
+    if (authError || !authData?.user) {
+      res.status(401).json({
+        success: false,
+        error: 'Invalid or expired token.',
+      });
+      return;
+    }
+
+    const { phone_number, role, full_name } = req.body;
+
+    if (!phone_number) {
+      res.status(400).json({
+        success: false,
+        error: 'phone_number is required.',
+      });
+      return;
+    }
+
+    const nameToUse = full_name || authData.user.user_metadata?.full_name || 'Citizen';
+
+    // Insert into profiles table
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .insert({
+        id: authData.user.id,
+        full_name: nameToUse,
+        phone_number,
+        role: role ?? 'citizen',
+        preferred_language: 'en',
+        civic_coins: 0,
+      })
+      .select()
+      .single();
+
+    if (profileError) {
+      if (profileError.code === '23505') {
+        res.status(400).json({ success: false, error: 'Phone number is already in use.' });
+        return;
+      }
+      throw new Error(`Failed to complete user profile: ${profileError.message}`);
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Profile completed successfully.',
+      data: profile,
+    });
+  } catch (err) {
+    next(err);
+  }
+}

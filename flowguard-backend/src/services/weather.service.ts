@@ -1,48 +1,76 @@
 import axios from 'axios';
-import { config } from '../config/env';
 import { supabaseAdmin } from '../config/supabase';
 import { WeatherData, Zone, AlertType, AlertLevel } from '../types';
 import { notifyZone } from './notification.service';
 
-const OWM_BASE = 'https://api.openweathermap.org/data/2.5';
+/**
+ * Maps Open-Meteo WMO Weather codes to descriptions.
+ */
+function getWeatherDescription(code: number): string {
+  if (code === 0) return 'Clear sky';
+  if ([1, 2, 3].includes(code)) return 'Partly cloudy';
+  if ([45, 48].includes(code)) return 'Foggy';
+  if ([51, 53, 55].includes(code)) return 'Drizzle';
+  if ([61, 63, 65].includes(code)) return 'Rain';
+  if ([71, 73, 75].includes(code)) return 'Snow';
+  if ([80, 81, 82].includes(code)) return 'Heavy showers';
+  if ([85, 86].includes(code)) return 'Snow showers';
+  if (code === 95) return 'Thunderstorm';
+  if ([96, 99].includes(code)) return 'Severe thunderstorm';
+  return 'Unknown';
+}
 
 /**
- * Fetches current marine/weather data from OpenWeatherMap for a given coordinate.
- * @param lat - Latitude of the location
- * @param lng - Longitude of the location
- * @returns WeatherData transformed from the OWM response
+ * Fetches current marine/weather data from Open-Meteo.
  */
-export async function fetchMarineWeather(
-  lat: number,
-  lng: number
-): Promise<WeatherData> {
+export async function fetchMarineWeather(lat: number, lng: number): Promise<WeatherData> {
   try {
-    const response = await axios.get(`${OWM_BASE}/weather`, {
-      params: {
-        lat,
-        lon: lng,
-        appid: config.openweather.apiKey,
-        units: 'metric',
-      },
-      timeout: 10000,
-    });
-
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,weather_code,precipitation&hourly=wave_height&wind_speed_unit=kmh&timezone=Asia/Kolkata`;
+    
+    const response = await axios.get(url, { timeout: 10000 });
     const data = response.data;
-
-    const windSpeedMs: number = data?.wind?.speed ?? 0;
-    const windSpeedKmh = parseFloat((windSpeedMs * 3.6).toFixed(2));
+    const current = data.current;
+    
+    const waveHeight = Array.isArray(data.hourly?.wave_height) && data.hourly.wave_height.length > 0
+      ? (data.hourly.wave_height[0] ?? 0)
+      : 0;
 
     return {
-      wind_speed_kmh: windSpeedKmh,
-      wave_height_m: 0, // OWM current weather does not include wave height
-      tide_time: null,
-      temperature_c: data?.main?.temp ?? 0,
-      humidity: data?.main?.humidity ?? 0,
-      description: data?.weather?.[0]?.description ?? 'unknown',
+      wind_speed_kmh: current?.wind_speed_10m ?? 0,
+      wave_height_m: waveHeight,
+      tide_time: 'N/A', // Open-Meteo does not map tides
+      temperature_c: current?.temperature_2m ?? 0,
+      humidity: current?.relative_humidity_2m ?? 0,
+      description: getWeatherDescription(current?.weather_code ?? -1),
     };
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    throw new Error(`Failed to fetch weather data from OpenWeatherMap: ${msg}`);
+    throw new Error(`Failed to fetch weather data from Open-Meteo: ${msg}`);
+  }
+}
+
+/**
+ * Fetches 3-day forecast from Open-Meteo.
+ */
+export async function fetchForecast(lat: number, lng: number) {
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=temperature_2m_max,temperature_2m_min,weather_code,wind_speed_10m_max,precipitation_sum&wind_speed_unit=kmh&timezone=Asia/Kolkata&forecast_days=3`;
+    const response = await axios.get(url, { timeout: 10000 });
+    const daily = response.data.daily;
+    
+    if (!daily || !daily.time) return [];
+
+    return daily.time.map((date: string, i: number) => ({
+      date,
+      min_temp: daily.temperature_2m_min[i] ?? 0,
+      max_temp: daily.temperature_2m_max[i] ?? 0,
+      description: getWeatherDescription(daily.weather_code[i] ?? -1),
+      wind_speed_kmh: daily.wind_speed_10m_max[i] ?? 0,
+      rain_mm: daily.precipitation_sum[i] ?? 0,
+    }));
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    throw new Error(`Failed to fetch forecast from Open-Meteo: ${msg}`);
   }
 }
 
@@ -52,13 +80,8 @@ export async function fetchMarineWeather(
  *   - wind >= 90 km/h OR wave >= 4m → RED cyclone alert
  *   - wind >= 60 km/h OR wave >= 3m → ORANGE storm_surge alert
  *   - wind >= 40 km/h OR wave >= 2m → YELLOW high_winds alert
- * @param weather - Current weather data for the zone
- * @param zone    - The zone to evaluate
  */
-export async function checkAlertThresholds(
-  weather: WeatherData,
-  zone: Zone
-): Promise<void> {
+export async function checkAlertThresholds(weather: WeatherData, zone: Zone): Promise<void> {
   const { wind_speed_kmh: wind, wave_height_m: wave } = weather;
 
   let alertType: AlertType | null = null;
@@ -76,7 +99,6 @@ export async function checkAlertThresholds(
   }
 
   if (alertType && severityLevel) {
-    // Check if an active alert already exists for this zone
     const { data: existingAlerts } = await supabaseAdmin
       .from('alerts')
       .select('id')
@@ -98,13 +120,7 @@ export async function checkAlertThresholds(
 }
 
 /**
- * Creates a weather-triggered alert in the database and notifies zone subscribers.
- * Alert expires 24 hours from creation time.
- * @param zoneId        - Target zone ID
- * @param alertType     - Type of weather alert
- * @param severityLevel - Alert severity level
- * @param weather       - Current weather data that triggered the alert
- * @returns The created alert record
+ * Creates a weather-triggered alert.
  */
 export async function createWeatherAlert(
   zoneId: string,
@@ -145,7 +161,6 @@ export async function createWeatherAlert(
     throw new Error(`Failed to create weather alert: ${error?.message}`);
   }
 
-  // Notify users in the zone asynchronously — do not block
   notifyZone(zoneId, alert).catch((err: unknown) => {
     console.error(`[WeatherService] Failed to notify zone ${zoneId}:`, err);
   });

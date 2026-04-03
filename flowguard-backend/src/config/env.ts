@@ -49,9 +49,6 @@ export const config = {
     emergencyNumber: optionalEnv('EMERGENCY_PHONE_NUMBER', ''),
   },
 
-  openweather: {
-    apiKey: requireEnv('OPENWEATHER_API_KEY'),
-  },
 
   triageService: {
     url: optionalEnv('TRIAGE_SERVICE_URL', 'http://localhost:8000'),

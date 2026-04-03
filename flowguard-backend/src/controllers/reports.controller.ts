@@ -34,7 +34,7 @@ export async function createReport(
   next: NextFunction
 ): Promise<void> {
   try {
-    const { category, description, latitude, longitude } = req.body;
+    const { category, description, latitude, longitude, location_name } = req.body;
     const file = req.file;
 
     if (!category || !latitude || !longitude) {
@@ -64,7 +64,7 @@ export async function createReport(
     const storagePath = `reports/${userId}/${Date.now()}.${ext}`;
 
     const { error: uploadError } = await supabaseAdmin.storage
-      .from('reports')
+      .from('FlowGaurd')
       .upload(storagePath, file.buffer, {
         contentType: file.mimetype,
         upsert: false,
@@ -75,7 +75,7 @@ export async function createReport(
     }
 
     const { data: urlData } = supabaseAdmin.storage
-      .from('reports')
+      .from('FlowGaurd')
       .getPublicUrl(storagePath);
 
     const photoUrl = urlData.publicUrl;
@@ -96,6 +96,7 @@ export async function createReport(
         description: description ?? null,
         latitude: lat,
         longitude: lng,
+        location_name: location_name ?? null,
         photo_url: photoUrl,
         status: 'reported',
         severity: triage.severity,

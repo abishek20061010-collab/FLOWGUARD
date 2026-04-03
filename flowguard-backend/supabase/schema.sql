@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS public.reports (
   blockage_type       text        NOT NULL DEFAULT 'unknown',
   assigned_to         uuid        REFERENCES public.profiles(id),
   resolution_photo_url text,
+  location_name       text,
   zone_id             uuid        REFERENCES public.zones(id),
   created_at          timestamptz DEFAULT now(),
   updated_at          timestamptz DEFAULT now()
@@ -167,6 +168,20 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 
 -- ============================================================
+-- RPC: is_admin
+-- Security definer function to avoid RLS infinite recursion
+-- ============================================================
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS boolean AS \$$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM public.profiles
+    WHERE id = (SELECT auth.uid()) AND role = ''admin''
+  );
+END;
+\$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
+-- ============================================================
 -- ENABLE ROW LEVEL SECURITY ON ALL TABLES
 -- ============================================================
 ALTER TABLE public.profiles         ENABLE ROW LEVEL SECURITY;
@@ -183,17 +198,17 @@ ALTER TABLE public.notifications_log ENABLE ROW LEVEL SECURITY;
 -- Citizens: select and update own row only
 CREATE POLICY "profiles_select_own"
   ON public.profiles FOR SELECT
-  USING (auth.uid() = id OR EXISTS (
+  USING ((SELECT auth.uid()) = id OR EXISTS (
     SELECT 1 FROM public.profiles p WHERE p.id = auth.uid() AND p.role = 'admin'
   ));
 
 CREATE POLICY "profiles_update_own"
   ON public.profiles FOR UPDATE
-  USING (auth.uid() = id);
+  USING ((SELECT auth.uid()) = id);
 
 CREATE POLICY "profiles_insert_own"
   ON public.profiles FOR INSERT
-  WITH CHECK (auth.uid() = id);
+  WITH CHECK ((SELECT auth.uid()) = id);
 
 
 -- ============================================================
@@ -202,7 +217,7 @@ CREATE POLICY "profiles_insert_own"
 -- All authenticated users can read zones
 CREATE POLICY "zones_select_authenticated"
   ON public.zones FOR SELECT
-  USING (auth.role() = 'authenticated');
+  USING ((SELECT auth.role()) = 'authenticated');
 
 -- Only admins can create/modify/delete zones
 CREATE POLICY "zones_admin_insert"
@@ -230,12 +245,12 @@ CREATE POLICY "zones_admin_delete"
 -- Citizens: insert and select own reports
 CREATE POLICY "reports_insert_own"
   ON public.reports FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK ((SELECT auth.uid()) = user_id);
 
 CREATE POLICY "reports_select_own"
   ON public.reports FOR SELECT
   USING (
-    auth.uid() = user_id
+    (SELECT auth.uid()) = user_id
     OR EXISTS (
       SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'
     )
@@ -255,7 +270,7 @@ CREATE POLICY "reports_admin_update"
 -- All authenticated users can view active alerts
 CREATE POLICY "alerts_select_authenticated"
   ON public.alerts FOR SELECT
-  USING (auth.role() = 'authenticated');
+  USING ((SELECT auth.role()) = 'authenticated');
 
 -- Only admins can create/modify/delete alerts
 CREATE POLICY "alerts_admin_insert"
@@ -283,12 +298,12 @@ CREATE POLICY "alerts_admin_delete"
 -- Citizens: insert and select own events
 CREATE POLICY "sos_insert_own"
   ON public.sos_events FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK ((SELECT auth.uid()) = user_id);
 
 CREATE POLICY "sos_select_own"
   ON public.sos_events FOR SELECT
   USING (
-    auth.uid() = user_id
+    (SELECT auth.uid()) = user_id
     OR EXISTS (
       SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'
     )

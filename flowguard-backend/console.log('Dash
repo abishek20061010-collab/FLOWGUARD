@@ -1,0 +1,1 @@
+import axios from 'axios'; axios.get('http://localhost:5000/api/admin/dashboard', {headers: {Authorization: 'Bearer test'}}).then(r=, r.data)).catch(e= Error:', e.response?.data 

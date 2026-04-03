@@ -76,7 +76,7 @@ export async function getDashboard(
         .eq('is_active', true),
       supabaseAdmin
         .from('reports')
-        .select('*, profiles(full_name, phone_number)')
+        .select('*, profiles!user_id(full_name, phone_number)')
         .order('created_at', { ascending: false })
         .limit(5),
     ]);
@@ -119,7 +119,7 @@ export async function getAllReports(
 
     let query = supabaseAdmin
       .from('reports')
-      .select('*, profiles(full_name, phone_number), zones(name)', {
+      .select('*, profiles!user_id(full_name, phone_number), zones(name)', {
         count: 'exact',
       })
       .order('created_at', { ascending: false })

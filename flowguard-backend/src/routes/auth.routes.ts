@@ -6,6 +6,7 @@ import {
   getMe,
   refreshToken,
   updateFcmToken,
+  completeProfile,
 } from '../controllers/auth.controller';
 import { authMiddleware } from '../middleware/auth.middleware';
 
@@ -17,5 +18,6 @@ router.post('/logout', authMiddleware, logout);
 router.get('/me', authMiddleware, getMe);
 router.post('/refresh', refreshToken);
 router.patch('/fcm-token', authMiddleware, updateFcmToken);
+router.post('/complete-profile', completeProfile);
 
 export default router;

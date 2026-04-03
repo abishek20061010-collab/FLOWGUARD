@@ -3,7 +3,7 @@ import { getCoastalZones } from '../services/geofence.service';
 import { fetchMarineWeather, checkAlertThresholds } from '../services/weather.service';
 
 /**
- * Polls OpenWeatherMap for all coastal zones every 15 minutes.
+ * Polls Open-Meteo for all coastal zones every 15 minutes.
  * Evaluates weather thresholds and creates/deactivates alerts accordingly.
  * Each zone is wrapped in a try-catch so failures are isolated.
  */

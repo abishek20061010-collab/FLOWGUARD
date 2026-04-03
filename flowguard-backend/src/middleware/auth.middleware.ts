@@ -26,6 +26,24 @@ export async function authMiddleware(
 
     const token = authHeader.split(' ')[1];
 
+    // Development Mock Bypass
+    if (process.env.NODE_ENV === 'development') {
+      if (token === 'MOCK_CITIZEN_TOKEN' || token === 'MOCK_ADMIN_TOKEN') {
+        const isCitizen = token === 'MOCK_CITIZEN_TOKEN';
+        req.user = {
+          id: isCitizen ? 'citizen-123' : 'admin-456',
+          role: isCitizen ? 'citizen' : 'admin',
+          full_name: isCitizen ? 'Mock Citizen' : 'Mock Admin',
+          phone_number: '+919999999999',
+          created_at: new Date().toISOString(),
+          civic_coins: 0,
+          fcm_token: null,
+          preferred_language: 'en'
+        };
+        return next();
+      }
+    }
+
     // Verify token with Supabase Auth
     const { data: authData, error: authError } =
       await supabaseAdmin.auth.getUser(token);

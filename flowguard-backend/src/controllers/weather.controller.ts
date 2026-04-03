@@ -1,17 +1,11 @@
-import axios from 'axios';
 import { Response, NextFunction } from 'express';
 import { supabaseAdmin } from '../config/supabase';
-import { AuthenticatedRequest, WeatherData } from '../types';
-import { config } from '../config/env';
+import { AuthenticatedRequest } from '../types';
 import { getCoastalZones } from '../services/geofence.service';
-
-const OWM_BASE = 'https://api.openweathermap.org/data/2.5';
+import { fetchMarineWeather, fetchForecast } from '../services/weather.service';
 
 // ─── GET /api/weather/marine ─────────────────────────────────────────────────
 
-/**
- * Returns current weather data for a coordinate from OpenWeatherMap.
- */
 export async function getMarineWeather(
   req: AuthenticatedRequest,
   res: Response,
@@ -29,52 +23,19 @@ export async function getMarineWeather(
       return;
     }
 
-    const response = await axios.get(`${OWM_BASE}/weather`, {
-      params: {
-        lat: parseFloat(lat as string),
-        lon: parseFloat(lng as string),
-        appid: config.openweather.apiKey,
-        units: 'metric',
-      },
-      timeout: 10000,
-    });
-
-    const d = response.data;
-
-    const weather: WeatherData = {
-      wind_speed_kmh: parseFloat(((d?.wind?.speed ?? 0) * 3.6).toFixed(2)),
-      wave_height_m: 0,
-      tide_time: null,
-      temperature_c: d?.main?.temp ?? 0,
-      humidity: d?.main?.humidity ?? 0,
-      description: d?.weather?.[0]?.description ?? 'unknown',
-    };
+    const weather = await fetchMarineWeather(parseFloat(lat as string), parseFloat(lng as string));
 
     res.status(200).json({
       success: true,
       data: weather,
     });
   } catch (err: unknown) {
-    if (axios.isAxiosError(err)) {
-      const message =
-        err.response?.data?.message ?? err.message ?? 'OpenWeatherMap request failed';
-      const status = err.response?.status ?? 502;
-      res.status(status).json({
-        success: false,
-        error: `Weather API error: ${message}`,
-        code: status,
-      });
-      return;
-    }
     next(err);
   }
 }
 
 // ─── GET /api/weather/forecast ───────────────────────────────────────────────
 
-/**
- * Returns a simplified 3-day weather forecast from the OWM 5-day API.
- */
 export async function getWeatherForecast(
   req: AuthenticatedRequest,
   res: Response,
@@ -92,85 +53,19 @@ export async function getWeatherForecast(
       return;
     }
 
-    const response = await axios.get(`${OWM_BASE}/forecast`, {
-      params: {
-        lat: parseFloat(lat as string),
-        lon: parseFloat(lng as string),
-        appid: config.openweather.apiKey,
-        units: 'metric',
-        cnt: 24, // 8 slots/day × 3 days
-      },
-      timeout: 10000,
-    });
-
-    const list: Array<{
-      dt_txt: string;
-      main: { temp_min: number; temp_max: number };
-      weather: Array<{ description: string }>;
-      wind: { speed: number };
-      rain?: { '3h'?: number };
-    }> = response.data?.list ?? [];
-
-    // Group by date and aggregate
-    const dayMap = new Map<
-      string,
-      {
-        temps: number[];
-        descriptions: string[];
-        winds: number[];
-        rain: number;
-      }
-    >();
-
-    for (const item of list) {
-      const date = item.dt_txt.split(' ')[0];
-      if (!dayMap.has(date)) {
-        dayMap.set(date, { temps: [], descriptions: [], winds: [], rain: 0 });
-      }
-      const entry = dayMap.get(date)!;
-      entry.temps.push(item.main.temp_min, item.main.temp_max);
-      entry.descriptions.push(item.weather?.[0]?.description ?? 'unknown');
-      entry.winds.push(item.wind?.speed ?? 0);
-      entry.rain += item.rain?.['3h'] ?? 0;
-    }
-
-    const forecast = Array.from(dayMap.entries())
-      .slice(0, 3)
-      .map(([date, data]) => ({
-        date,
-        min_temp: parseFloat(Math.min(...data.temps).toFixed(1)),
-        max_temp: parseFloat(Math.max(...data.temps).toFixed(1)),
-        description: data.descriptions[0] ?? 'unknown',
-        wind_speed_kmh: parseFloat(
-          ((data.winds.reduce((a, b) => a + b, 0) / data.winds.length) * 3.6).toFixed(2)
-        ),
-        rain_mm: parseFloat(data.rain.toFixed(2)),
-      }));
+    const forecast = await fetchForecast(parseFloat(lat as string), parseFloat(lng as string));
 
     res.status(200).json({
       success: true,
       data: forecast,
     });
   } catch (err: unknown) {
-    if (axios.isAxiosError(err)) {
-      const message = err.response?.data?.message ?? err.message;
-      const status = err.response?.status ?? 502;
-      res.status(status).json({
-        success: false,
-        error: `Forecast API error: ${message}`,
-        code: status,
-      });
-      return;
-    }
     next(err);
   }
 }
 
 // ─── GET /api/weather/coastal-status ─────────────────────────────────────────
 
-/**
- * Returns current weather and active alert level for all coastal zones.
- */
 export async function getCoastalStatus(
   _req: AuthenticatedRequest,
   res: Response,
@@ -182,25 +77,7 @@ export async function getCoastalStatus(
     const results = await Promise.allSettled(
       zones.map(async (zone) => {
         // Fetch current weather
-        const weatherRes = await axios.get(`${OWM_BASE}/weather`, {
-          params: {
-            lat: zone.center_latitude,
-            lon: zone.center_longitude,
-            appid: config.openweather.apiKey,
-            units: 'metric',
-          },
-          timeout: 8000,
-        });
-
-        const d = weatherRes.data;
-        const weather: WeatherData = {
-          wind_speed_kmh: parseFloat(((d?.wind?.speed ?? 0) * 3.6).toFixed(2)),
-          wave_height_m: 0,
-          tide_time: null,
-          temperature_c: d?.main?.temp ?? 0,
-          humidity: d?.main?.humidity ?? 0,
-          description: d?.weather?.[0]?.description ?? 'unknown',
-        };
+        const weather = await fetchMarineWeather(zone.center_latitude, zone.center_longitude);
 
         // Fetch current active alert for this zone
         const { data: activeAlerts } = await supabaseAdmin
