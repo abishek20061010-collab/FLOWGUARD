@@ -1,4 +1,4 @@
-<h1 align="center" id="title">The Unified Platform for Urban Maintenance and Disaster Resilience</h1>
+><h1 align="center" id="title">The Unified Platform for Urban Maintenance and Disaster Resilience</h1>
 
 <p align="center"><img src="https://socialify.git.ci/abishek20061010-collab/FLOWGUARD/image?custom_description=Solving+urban+flooding+caused+by+clogged+drains+and+delayed+response+through+AI-powered+detection%2C+real-time+reporting%2C+and+smart+alerts.&amp;custom_language=HTML&amp;description=1&amp;font=Inter&amp;language=1&amp;name=1&amp;owner=1&amp;pattern=Plus&amp;theme=Dark" alt="project-image"></p>
 
@@ -8,13 +8,30 @@
 
 <h2>🚀 Demo</h2>
 
-[http://localhost:5173/](http://localhost:5173/)
-
+https://drive.google.com/file/d/1bxPXY5P5NeLuVKgZ0Y0C7WHXfW71r3Yp/view?usp=sharing
 <h2>Project Screenshots:</h2>
 
-<img src="" alt="project-screenshot" width="400" height="400/">
+Admin dashboard
+<img width="1895" height="873" alt="admin dashboard" src="https://github.com/user-attachments/assets/d3ad5639-a7ee-45b5-a890-f0e3df371b98" />
+citizen-dashboard
+<img width="1895" height="879" alt="citizen-dashboard" src="https://github.com/user-attachments/assets/94a8ee2e-7d24-47f1-ae71-c83b8f76750f" />
+dashboard-live location map
+<img width="1895" height="877" alt="dashboard-live location map" src="https://github.com/user-attachments/assets/28725b03-cb75-433b-8ed0-c513f9a11fa8" />
+marine dashboard
+<img width="1895" height="862" alt="marine dashboard" src="https://github.com/user-attachments/assets/ae40ffbf-9797-40b4-9173-16198167d441" />
+Report issue
+<img width="1903" height="872" alt="Report issue" src="https://github.com/user-attachments/assets/58e36277-ebe0-4137-bfe7-c30482fd1a9d" />
+Reports
+<img width="1904" height="864" alt="Reports" src="https://github.com/user-attachments/assets/a5ee81d8-0ad1-4ed0-bd39-8a001415aac8" />
+Reports
+<img width="1905" height="867" alt="Teams" src="https://github.com/user-attachments/assets/624f65e4-c814-4e50-b0df-0409e4b31e28" />
+ticket history
+<img width="1898" height="867" alt="ticket history" src="https://github.com/user-attachments/assets/87ab942b-41fa-4a34-9ac8-12a83d00c958" />
+Ticket queue
+<img width="1572" height="682" alt="Ticket queue" src="https://github.com/user-attachments/assets/211303d7-66fd-443d-ad04-318091299621" />
 
-<img src="" alt="project-screenshot" width="400" height="400/">
+
+
 
   
   
@@ -81,3 +98,42 @@ Technologies used in the project:
 *   Maps & Location: Leaflet.js Geolocation API
 *   Realtime: Supabase Realtime
 *   Deployment: Vercel Railway / Render Fly.io
+
+
+
+## 👥 Team FlowGuard
+
+FlowGuard was designed and developed as part of a collaborative effort to build a real-world smart city solution focused on urban resilience and disaster prevention.
+
+### 🚀 Core Contributors
+
+| Name | Role | Contributions |
+|------|------|--------------|
+| **Harishwer** | Full Stack Developer | Led end-to-end development including frontend (React), backend (Node.js), API integration, system architecture, and deployment |
+| **Saran** | AI/ML Engineer | Designed and implemented image classification models for blockage detection and severity analysis |
+| **Abishek** | UI/UX Designer | Crafted user interface, user experience flows, and ensured accessibility across devices |
+| **Naveen** | Backend Developer | Developed APIs, handled database design (Supabase), and implemented authentication & real-time features |
+
+---
+
+### 🛠️ Responsibilities Breakdown
+
+- **Frontend Development:** React (Vite, TypeScript), Tailwind CSS  
+- **Backend Development:** Node.js, Express.js  
+- **Database & Realtime:** Supabase (PostgreSQL, Realtime)  
+- **AI/ML Integration:** Python (FastAPI, TensorFlow Lite / HuggingFace)  
+- **External Integrations:** OpenWeatherMap API, Firebase FCM, Twilio SMS  
+- **System Design:** Multi-input architecture (Citizen + AI + IoT-ready)  
+
+---
+
+### 🤝 Collaboration
+
+This project was built with a strong focus on teamwork, combining expertise in full-stack development, artificial intelligence, and user-centered design to deliver a scalable and impactful solution.
+
+---
+
+
+### 🏁 Acknowledgment
+
+We thank the hackathon organizers and mentors for providing the opportunity to build FlowGuard and address real-world urban challenges through technology.
