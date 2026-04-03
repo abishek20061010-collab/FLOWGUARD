@@ -1,0 +1,51 @@
+services:
+  # 1. ML Triage Service (Python FastAPI)
+  - type: web
+    name: flowguard-ml
+    env: python
+    rootDir: flowguard-ml
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -k uvicorn.workers.UvicornWorker main:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: PORT
+        value: 10000
+
+  # 2. Backend API (Node.js Express)
+  - type: web
+    name: flowguard-backend
+    env: node
+    rootDir: flowguard-backend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 18.0.0
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_PHONE_NUMBER
+        sync: false
+      - key: EMERGENCY_PHONE_NUMBER
+        sync: false
+      - key: TRIAGE_SERVICE_URL
+        fromService:
+          name: flowguard-ml
+          type: web
+          property: host
+      - key: FRONTEND_URL
+        sync: false # Set this to your Vercel URL later

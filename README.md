@@ -1,4 +1,4 @@
-><h1 align="center" id="title">The Unified Platform for Urban Maintenance and Disaster Resilience</h1>
+<h1 align="center" id="title">The Unified Platform for Urban Maintenance and Disaster Resilience</h1>
 
 <p align="center"><img src="https://socialify.git.ci/abishek20061010-collab/FLOWGUARD/image?custom_description=Solving+urban+flooding+caused+by+clogged+drains+and+delayed+response+through+AI-powered+detection%2C+real-time+reporting%2C+and+smart+alerts.&amp;custom_language=HTML&amp;description=1&amp;font=Inter&amp;language=1&amp;name=1&amp;owner=1&amp;pattern=Plus&amp;theme=Dark" alt="project-image"></p>
 
@@ -9,97 +9,112 @@
 <h2>🚀 Demo</h2>
 
 https://drive.google.com/file/d/1bxPXY5P5NeLuVKgZ0Y0C7WHXfW71r3Yp/view?usp=sharing
+
 <h2>Project Screenshots:</h2>
 
-Admin dashboard
+**Admin dashboard**
 <img width="1895" height="873" alt="admin dashboard" src="https://github.com/user-attachments/assets/d3ad5639-a7ee-45b5-a890-f0e3df371b98" />
-citizen-dashboard
+
+**Citizen dashboard**
 <img width="1895" height="879" alt="citizen-dashboard" src="https://github.com/user-attachments/assets/94a8ee2e-7d24-47f1-ae71-c83b8f76750f" />
-dashboard-live location map
+
+**Dashboard live location map**
 <img width="1895" height="877" alt="dashboard-live location map" src="https://github.com/user-attachments/assets/28725b03-cb75-433b-8ed0-c513f9a11fa8" />
-marine dashboard
+
+**Marine dashboard**
 <img width="1895" height="862" alt="marine dashboard" src="https://github.com/user-attachments/assets/ae40ffbf-9797-40b4-9173-16198167d441" />
-Report issue
+
+**Report issue**
 <img width="1903" height="872" alt="Report issue" src="https://github.com/user-attachments/assets/58e36277-ebe0-4137-bfe7-c30482fd1a9d" />
-Reports
+
+**Reports**
 <img width="1904" height="864" alt="Reports" src="https://github.com/user-attachments/assets/a5ee81d8-0ad1-4ed0-bd39-8a001415aac8" />
-Reports
+
+**Field Teams**
 <img width="1905" height="867" alt="Teams" src="https://github.com/user-attachments/assets/624f65e4-c814-4e50-b0df-0409e4b31e28" />
-ticket history
+
+**Ticket history**
 <img width="1898" height="867" alt="ticket history" src="https://github.com/user-attachments/assets/87ab942b-41fa-4a34-9ac8-12a83d00c958" />
-Ticket queue
+
+**Ticket queue**
 <img width="1572" height="682" alt="Ticket queue" src="https://github.com/user-attachments/assets/211303d7-66fd-443d-ad04-318091299621" />
 
 
-
-
-  
-  
 <h2>🧐 Features</h2>
 
 Here're some of the project's best features:
 
-*   Geotagged Issue Reporting – Report clogged drains or infrastructure issues with images and automatic location detection
-*   AI-Based Detection & Triage – Classifies blockage type and assigns severity (Low Medium High) using ML
-*   Live Issue Tracking – Track report status in real time (Reported → Assigned → Resolved)
-*   Smart Admin Dashboard – Clusters reports identifies high-risk zones and enables faster decision-making
-*   Real-Time Weather Alerts – Detects risky conditions and triggers Yellow Orange and Red alerts
-*   Marine Safety Dashboard – Provides fishermen with wind speed wave height and tide information
-*   SOS Emergency System – One-click emergency alert with live location sharing to authorities
-*   Offline SMS Fallback – Sends SOS via SMS when internet connectivity is unavailable
-*   Push Notifications – Instant alerts using Firebase for weather risks and updates
-*   Multi-Input Architecture – Combines citizen reports AI analysis and IoT-ready data integration
-*   Civic Coins System – Rewards users for valid reports that lead to issue resolution
-*   Multi-Language Support – Supports English and Tamil for accessibility
+*   **Geotagged Issue Reporting** – Report clogged drains or infrastructure issues with images and automatic location detection
+*   **AI-Based Detection & Triage** – Classifies blockage type and assigns severity (Low, Medium, High) using ML
+*   **Live Issue Tracking** – Track report status in real time (Reported → Assigned → Resolved)
+*   **Smart Admin Dashboard** – Clusters reports, identifies high-risk zones, and enables faster decision-making
+*   **Real-Time Weather Alerts** – Detects risky conditions and triggers Yellow, Orange, and Red alerts
+*   **Marine Safety Dashboard** – Provides fishermen with wind speed, wave height, and tide information
+*   **SOS Emergency System** – One-click emergency alert with live location sharing to authorities
+*   **Offline SMS Fallback** – Sends SOS via SMS when internet connectivity is unavailable
+*   **Push Notifications** – Instant alerts using Firebase for weather risks and updates
+*   **Multi-Input Architecture** – Combines citizen reports, AI analysis, and IoT-ready data integration
+*   **Civic Coins System** – Rewards users for valid reports that lead to issue resolution
+*   **Multi-Language Support** – Supports English and Tamil for accessibility
 
 <h2>🛠️ Installation Steps:</h2>
 
 <p>1. Clone Repository</p>
 
-```
-git clone https://github.com/your-username/flowguard.git cd flowguard
+```bash
+git clone https://github.com/abishek20061010-collab/FLOWGUARD.git
+cd FLOWGUARD
 ```
 
 <p>2. Install Backend Dependencies</p>
 
-```
-cd flowguard-backend npm install
+```bash
+cd flowguard-backend
+npm install
 ```
 
 <p>3. Run Backend Server</p>
 
-```
+```bash
 npm run dev
 ```
 
 <p>4. Install Frontend Dependencies</p>
 
-```
-cd ../flowguard-web npm install
+```bash
+cd ../frontend
+npm install
 ```
 
 <p>5. Run Frontend Application</p>
 
-```
+```bash
 npm run dev
 ```
 
-  
-  
-<h2>💻 Built with</h2>
+## 🌐 Deployment
 
-Technologies used in the project:
+### 1. Backend & ML (Render)
+This project uses a **Render Blueprint** for a one-click deployment of the backend and ML services.
 
-*   Frontend: React (Vite TypeScript) Tailwind CSS
-*   Backend: Node.js Express.js
-*   Database: Supabase (PostgreSQL)
-*   AI/ML: Python (FastAPI TensorFlow Lite / HuggingFace)
-*   APIs & Services: OpenWeatherMap API Firebase Cloud Messaging Twilio API
-*   Maps & Location: Leaflet.js Geolocation API
-*   Realtime: Supabase Realtime
-*   Deployment: Vercel Railway / Render Fly.io
+1.  Create a **New Blueprints Instance** on Render.
+2.  Connect your GitHub repository.
+3.  Render will detect the `render.yaml` file and automatically configure:
+    - `flowguard-ml` (Python Web Service)
+    - `flowguard-backend` (Node.js Web Service)
+4.  **Fill in Environment Variables**: You will be prompted for Supabase, Firebase, and Twilio keys during the setup in the Render Dashboard.
+5.  **Connect Services**: Once deployed, the Backend will automatically receive the ML service URL, but you should manually set the `FRONTEND_URL` to your Vercel URL.
 
+### 2. Frontend (Vercel)
+1.  Connect your GitHub repository to Vercel.
+2.  **Set Root Directory**: Select the `frontend` folder.
+3.  **Environment Variables**:
+    - `VITE_API_BASE_URL`: Set this to your Render Backend URL (e.g., `https://flowguard-backend.onrender.com`).
+    - `VITE_SUPABASE_URL`: Your Supabase Project URL.
+    - `VITE_SUPABASE_ANON_KEY`: Your Supabase Anon Key.
+4.  Vercel will detect the `vercel.json` for routing.
 
+---
 
 ## 👥 Team FlowGuard
 
@@ -116,23 +131,18 @@ FlowGuard was designed and developed as part of a collaborative effort to build 
 
 ---
 
-### 🛠️ Responsibilities Breakdown
+### 💻 Built with
 
-- **Frontend Development:** React (Vite, TypeScript), Tailwind CSS  
-- **Backend Development:** Node.js, Express.js  
-- **Database & Realtime:** Supabase (PostgreSQL, Realtime)  
-- **AI/ML Integration:** Python (FastAPI, TensorFlow Lite / HuggingFace)  
-- **External Integrations:** OpenWeatherMap API, Firebase FCM, Twilio SMS  
-- **System Design:** Multi-input architecture (Citizen + AI + IoT-ready)  
+Technologies used in the project:
 
----
-
-### 🤝 Collaboration
-
-This project was built with a strong focus on teamwork, combining expertise in full-stack development, artificial intelligence, and user-centered design to deliver a scalable and impactful solution.
+*   **Frontend:** React (Vite, TypeScript), Tailwind CSS
+*   **Backend:** Node.js, Express.js
+*   **Database & Realtime:** Supabase (PostgreSQL, Realtime)
+*   **AI/ML Integration:** Python (FastAPI, TensorFlow Lite / HuggingFace)
+*   **External Integrations:** OpenWeatherMap API, Firebase FCM, Twilio SMS
+*   **System Design:** Multi-input architecture (Citizen + AI + IoT-ready)
 
 ---
-
 
 ### 🏁 Acknowledgment
 
