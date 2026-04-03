@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Node
 node_modules/
 dist/
@@ -16,3 +17,11 @@ venv/
 .vscode/
 .DS_Store
 Thumbs.db
+=======
+frontend/node_modules/
+frontend/dist/
+.vite/
+.DS_Store
+.env
+
+>>>>>>> origin/main
